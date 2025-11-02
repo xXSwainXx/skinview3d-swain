@@ -13,14 +13,14 @@ export class NameTagObject extends Sprite {
         this.isBold = options.isBold === undefined ? false : options.isBold;
         this.rankImage = options.rankImage || null;
         this.imageHeight = options.imageHeight || 20;
-        this.text = options.isPremiumRank ? `${options.rank} ${text}` : text;
+        this.divider = " ";
+        this.text = options.isPremiumRank ? `${options.rank}${this.divider}${text}` : text;
         this.font = options.font === undefined ? "20px Mojangles" : options.font;
         this.margin = options.margin === undefined ? [5, 2, 5, 2] : options.margin;
         this.textStyle = options.textStyle === undefined ? "white" : options.textStyle;
         this.dividerStyle = options.dividerStyle === undefined ? "#555555" : options.dividerStyle;
         this.backgroundStyle = options.backgroundStyle === undefined ? "rgba(0,0,0,.15)" : options.backgroundStyle;
         this.height = options.height === undefined ? 4.0 : options.height;
-        this.divider = " | ";
 
         const repaintAfterLoaded = options.repaintAfterLoaded === undefined ? true : options.repaintAfterLoaded;
         
