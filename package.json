@@ -1,6 +1,6 @@
 {
 	"name": "skinview3d-swain",
-	"version": "1.0.2",
+	"version": "1.0.0",
 	"description": "Extended Three.js powered Minecraft skin viewer",
 	"main": "libs/skinview3d.js",
 	"type": "module",
