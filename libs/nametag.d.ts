@@ -10,6 +10,8 @@ export interface NameTagOptions {
     isPremiumRank?: boolean;
     rank?: string;
     isBold?: boolean;
+    rankImage?: string;
+    imageHeight?: number;
 }
 export declare class NameTagObject extends Sprite {
     readonly painted: Promise<void>;
@@ -24,7 +26,10 @@ export declare class NameTagObject extends Sprite {
     private isPremiumRank;
     private isBold;
     private divider;
+    private rankImage;
+    private imageHeight;
     constructor(text?: string, options?: NameTagOptions);
     private loadAndPaint;
     private paint;
+    setRankImage(imageSrc: string): void;
 }
