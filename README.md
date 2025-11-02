@@ -6,4 +6,4 @@ Base Skinview3d library with extended features.
 * Capes
 * Nametags
 
-used for Plantaria
+used for Plantaria.net
