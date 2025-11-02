@@ -1,4 +1,4 @@
-import { CanvasTexture, LinearFilter, Sprite, SpriteMaterial } from "three";
+import { CanvasTexture, NearestFilter, Sprite, SpriteMaterial } from "three";
 
 export class NameTagObject extends Sprite {
     constructor(text = "", options = {}) {
@@ -21,7 +21,6 @@ export class NameTagObject extends Sprite {
         this.dividerStyle = options.dividerStyle === undefined ? "#555555" : options.dividerStyle;
         this.backgroundStyle = options.backgroundStyle === undefined ? "rgba(0,0,0,.15)" : options.backgroundStyle;
         this.height = options.height === undefined ? 4.0 : options.height;
-        this.resolutionScale = options.resolutionScale || 2;
 
         const repaintAfterLoaded = options.repaintAfterLoaded === undefined ? true : options.repaintAfterLoaded;
         
@@ -34,10 +33,14 @@ export class NameTagObject extends Sprite {
         }
     }
 
+    async loadAndPaint() {
+        await document.fonts.load(this.font, this.text);
+        this.paint();
+    }
+
     async paint() {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        const scale = this.resolutionScale;
         
         const rankFont = this.isBold ? `bold ${this.font}` : this.font;
         const textFont = this.font;
@@ -51,6 +54,7 @@ export class NameTagObject extends Sprite {
         let imageWidth = 0;
         let imageHeight = 0;
         let imageLoaded = false;
+        let loadedImage = null;
 
         if (this.rankImage && this.isPremiumRank) {
             try {
@@ -58,6 +62,7 @@ export class NameTagObject extends Sprite {
                 imageWidth = (img.width / img.height) * this.imageHeight;
                 imageHeight = this.imageHeight;
                 imageLoaded = true;
+                loadedImage = img;
             } catch (error) {
                 console.error("Failed to load rank image:", error);
                 imageLoaded = false;
@@ -68,31 +73,31 @@ export class NameTagObject extends Sprite {
             this.margin[3] + imageWidth + this.margin[1] : 
             this.margin[3] + beforeMetrics.width + this.margin[1];
 
-        canvas.width = (imageSectionWidth +
+        canvas.width = imageSectionWidth +
             (this.isPremiumRank ? dividerMetrics.width + this.margin[1] : 0) +
             (this.isPremiumRank ? afterMetrics.width : 0) +
-            this.margin[1]) * scale;
+            this.margin[1];
 
-        canvas.height = (this.margin[0] + 
+        canvas.height = this.margin[0] + 
             Math.max(
                 beforeMetrics.actualBoundingBoxAscent + beforeMetrics.actualBoundingBoxDescent,
                 imageHeight
             ) + 
-            this.margin[2]) * scale;
-
-        ctx.scale(scale, scale);
-
-        const scaledImageHeight = imageHeight * scale;
-        const scaledImageWidth = imageWidth * scale;
+            this.margin[2];
 
         ctx.fillStyle = this.backgroundStyle;
-        ctx.fillRect(0, 0, canvas.width / scale, canvas.height / scale);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         if (this.isPremiumRank) {
             if (imageLoaded && this.rankImage) {
-                const img = await this.loadImage(this.rankImage);
-                const yPos = this.margin[0] + (canvas.height/scale - this.margin[0] - this.margin[2] - imageHeight) / 2;
+                const img = loadedImage;
+                const yPos = this.margin[0] + (canvas.height - this.margin[0] - this.margin[2] - imageHeight) / 2;
+                
+                // NUR DIESEN TEIL FÜR BESSERE BILDQUALITÄT GEÄNDERT:
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
                 ctx.drawImage(img, this.margin[3], yPos, imageWidth, imageHeight);
+                
             } else {
                 ctx.font = rankFont;
                 ctx.fillStyle = this.textStyle;
@@ -132,15 +137,12 @@ export class NameTagObject extends Sprite {
         }
 
         const texture = new CanvasTexture(canvas);
-        texture.magFilter = LinearFilter;
-        texture.minFilter = LinearFilter;
-        texture.generateMipmaps = true;
-        
+        texture.magFilter = NearestFilter;
+        texture.minFilter = NearestFilter;
         this.textMaterial.map = texture;
         this.textMaterial.needsUpdate = true;
-        
-        this.scale.x = (canvas.width / canvas.height) * this.height / scale;
-        this.scale.y = this.height / scale;
+        this.scale.x = (canvas.width / canvas.height) * this.height;
+        this.scale.y = this.height;
     }
 
     loadImage(src) {
