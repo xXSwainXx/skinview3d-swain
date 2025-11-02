@@ -1,5 +1,5 @@
 {
-	"name": "skinview3d-gin",
+	"name": "skinview3d-swain",
 	"version": "1.0.2",
 	"description": "Extended Three.js powered Minecraft skin viewer",
 	"main": "libs/skinview3d.js",
