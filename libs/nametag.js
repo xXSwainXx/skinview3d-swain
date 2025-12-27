@@ -99,6 +99,17 @@ export class NameTagObject extends Sprite {
     
         ctx.fillStyle = this.backgroundStyle;
         ctx.fillRect(0, 0, logicalWidth, logicalHeight);
+
+        // NEU: Logik für Gradienten-Support
+        let finalStyle = this.textStyle;
+        if (Array.isArray(this.textStyle)) {
+            // Wir erstellen einen vertikalen Gradienten passend zur Schrifthöhe
+            const gradient = ctx.createLinearGradient(0, this.margin[0], 0, logicalHeight - this.margin[2]);
+            this.textStyle.forEach((color, index) => {
+                gradient.addColorStop(index / (this.textStyle.length - 1), color);
+            });
+            finalStyle = gradient;
+        }
     
         if (this.isPremiumRank) {
             if (imageLoaded && this.rankImage) {
@@ -129,7 +140,7 @@ export class NameTagObject extends Sprite {
             );
     
             ctx.font = textFont;
-            ctx.fillStyle = this.textStyle;
+            ctx.fillStyle = finalStyle; // Gradient anwenden
             ctx.fillText(
                 this.text.split(this.divider)[1],
                 dividerXPos + dividerMetrics.width + this.margin[1],
@@ -137,7 +148,7 @@ export class NameTagObject extends Sprite {
             );
         } else {
             ctx.font = textFont;
-            ctx.fillStyle = this.textStyle;
+            ctx.fillStyle = finalStyle; // Gradient anwenden
             ctx.fillText(
                 this.text,
                 this.margin[3],
