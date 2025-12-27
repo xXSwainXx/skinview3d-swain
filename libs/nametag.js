@@ -100,12 +100,12 @@ export class NameTagObject extends Sprite {
         ctx.fillStyle = this.backgroundStyle;
         ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
-        // NEU: Logik für Horizontalen Gradienten-Support (Rechts nach Links)
+        // NEU: Logik für Horizontalen Gradienten-Support (Links nach Rechts)
         let finalStyle = this.textStyle;
         if (Array.isArray(this.textStyle)) {
-            // Start bei logicalWidth (rechts), Ende bei 0 (links)
-            // Y-Werte bleiben gleich (0), damit es perfekt horizontal ist
-            const gradient = ctx.createLinearGradient(logicalWidth - this.margin[1], 0, this.margin[3], 0);
+            // Start bei x=margin[3] (Links), Ende bei x=logicalWidth-margin[1] (Rechts)
+            // Die y-Werte (0, 0) sorgen dafür, dass der Verlauf exakt horizontal bleibt
+            const gradient = ctx.createLinearGradient(this.margin[3], 0, logicalWidth - this.margin[1], 0);
             
             this.textStyle.forEach((color, index) => {
                 gradient.addColorStop(index / (this.textStyle.length - 1), color);
